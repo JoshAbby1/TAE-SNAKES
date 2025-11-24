@@ -18,25 +18,31 @@
     text-align: center;
     touch-action: none;
   }
-  h1 { margin: 20px 0 10px; }
-  p, #author { margin: 0 0 10px; }
+  h1 { margin: 10px 0 5px; font-size: 24px; }
+  p, #author { margin: 0 0 5px; font-size: 16px; }
   canvas { background: #000; display: block; margin-top: 10px; }
-  #score { margin: 10px; font-size: 24px; }
+  #score { margin: 5px; font-size: 20px; }
   .controls {
     display: grid;
-    grid-template-columns: 60px 60px 60px;
-    grid-template-rows: 60px 60px;
-    gap: 10px;
+    grid-template-columns: 50px 50px 50px;
+    grid-template-rows: 50px 50px;
+    gap: 8px;
     margin-top: 10px;
   }
   .controls button {
-    font-size: 20px;
-    padding: 10px;
+    font-size: 18px;
+    padding: 8px;
     cursor: pointer;
     background: #555;
     color: #fff;
     border: none;
     border-radius: 5px;
+  }
+  #restartBtn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
   }
 </style>
 </head>
@@ -66,17 +72,18 @@ let food;
 let direction;
 let score;
 let gameInterval;
-let speed = 350; // starting slower
+let speed = 350; // start slow
 let startTime;
 
 function resizeCanvas() {
+  // Max height 50% of screen so controls fit
+  const maxHeight = window.innerHeight * 0.5;
+  let width = maxHeight * 4 / 5; // 4:5 ratio
+  let height = maxHeight;
   const maxWidth = window.innerWidth * 0.9;
-  const maxHeight = window.innerHeight * 0.6;
-  let width = maxWidth;
-  let height = width * 5 / 4;
-  if (height > maxHeight) {
-    height = maxHeight;
-    width = height * 4 / 5;
+  if (width > maxWidth) {
+    width = maxWidth;
+    height = width * 5 / 4;
   }
   canvas.width = Math.floor(width / cellSize) * cellSize;
   canvas.height = Math.floor(height / cellSize) * cellSize;
@@ -108,8 +115,8 @@ function placeFood() {
 }
 
 function updateSpeed() {
-  const elapsed = (Date.now() - startTime) / 1000; // seconds
-  if (elapsed > 60 && speed > 220) { // gradually faster after 1 min
+  const elapsed = (Date.now() - startTime) / 1000; 
+  if (elapsed > 60 && speed > 220) { // speed up gradually
     speed = 220;
     clearInterval(gameInterval);
     gameInterval = setInterval(gameLoop, speed);
