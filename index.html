@@ -38,7 +38,7 @@
     border: none;
     border-radius: 5px;
   }
-  #restartBtn {
+  #restartBtn, #startBtn {
     margin-top: 10px;
     padding: 8px 16px;
     font-size: 16px;
@@ -50,20 +50,27 @@
 <h1>Snake Game</h1>
 <p>Use arrow keys or buttons to move. Eat the red food and grow!</p>
 <p id="author">Made by @nortydigitalcrew</p>
-<div id="score">Score: 0</div>
-<canvas id="gameCanvas"></canvas>
 
-<div class="controls">
-  <div></div><button id="upBtn">↑</button><div></div>
-  <button id="leftBtn">←</button><div></div><button id="rightBtn">→</button>
-  <div></div><button id="downBtn">↓</button><div></div>
+<button id="startBtn">Start</button>
+
+<div id="gameUI" style="display:none;">
+  <div id="score">Score: 0</div>
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="controls">
+    <div></div><button id="upBtn">↑</button><div></div>
+    <button id="leftBtn">←</button><div></div><button id="rightBtn">→</button>
+    <div></div><button id="downBtn">↓</button><div></div>
+  </div>
+
+  <button id="restartBtn">Restart</button>
 </div>
-
-<button id="restartBtn">Restart</button>
 
 <script>
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const gameUI = document.getElementById('gameUI');
+const startBtn = document.getElementById('startBtn');
 
 const cellSize = 20;
 let rows, cols;
@@ -76,9 +83,8 @@ let speed = 350; // start slow
 let startTime;
 
 function resizeCanvas() {
-  // Max height 50% of screen so controls fit
   const maxHeight = window.innerHeight * 0.5;
-  let width = maxHeight * 4 / 5; // 4:5 ratio
+  let width = maxHeight * 4 / 5; 
   let height = maxHeight;
   const maxWidth = window.innerWidth * 0.9;
   if (width > maxWidth) {
@@ -116,7 +122,7 @@ function placeFood() {
 
 function updateSpeed() {
   const elapsed = (Date.now() - startTime) / 1000; 
-  if (elapsed > 60 && speed > 220) { // speed up gradually
+  if (elapsed > 60 && speed > 220) { 
     speed = 220;
     clearInterval(gameInterval);
     gameInterval = setInterval(gameLoop, speed);
@@ -127,7 +133,6 @@ function gameLoop() {
   updateSpeed();
 
   const head = {...snake[0]};
-
   if (direction === 'UP') head.y--;
   else if (direction === 'DOWN') head.y++;
   else if (direction === 'LEFT') head.x--;
@@ -181,11 +186,19 @@ document.getElementById('rightBtn').addEventListener('click', () => { if(directi
 // Restart button
 document.getElementById('restartBtn').addEventListener('click', init);
 
-// Start game
-init();
+// Start button
+startBtn.addEventListener('click', () => {
+  startBtn.style.display = 'none';
+  gameUI.style.display = 'block';
+  init();
+});
+
+// Resize canvas
 window.addEventListener('resize', () => {
-  resizeCanvas();
-  draw();
+  if(gameUI.style.display !== 'none') {
+    resizeCanvas();
+    draw();
+  }
 });
 
 // Prevent zoom and touch scrolling
