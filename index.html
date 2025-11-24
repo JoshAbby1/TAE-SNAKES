@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Classic Snake Game</title>
 <style>
   body {
@@ -16,6 +16,7 @@
     color: #fff;
     font-family: sans-serif;
     text-align: center;
+    touch-action: none;
   }
   h1 { margin: 20px 0 10px; }
   p, #author { margin: 0 0 10px; }
@@ -65,7 +66,7 @@ let food;
 let direction;
 let score;
 let gameInterval;
-let speed = 220; // starting speed in ms
+let speed = 350; // starting slower
 let startTime;
 
 function resizeCanvas() {
@@ -90,7 +91,7 @@ function init() {
   placeFood();
   score = 0;
   document.getElementById('score').innerText = 'Score: 0';
-  speed = 220;
+  speed = 350;
   startTime = Date.now();
 
   clearInterval(gameInterval);
@@ -108,8 +109,8 @@ function placeFood() {
 
 function updateSpeed() {
   const elapsed = (Date.now() - startTime) / 1000; // seconds
-  if (elapsed > 60 && speed > 100) { // after 1 min, speed up
-    speed = 150; 
+  if (elapsed > 60 && speed > 220) { // gradually faster after 1 min
+    speed = 220;
     clearInterval(gameInterval);
     gameInterval = setInterval(gameLoop, speed);
   }
@@ -179,6 +180,10 @@ window.addEventListener('resize', () => {
   resizeCanvas();
   draw();
 });
+
+// Prevent zoom and touch scrolling
+document.body.addEventListener('touchstart', e => e.preventDefault(), {passive:false});
+document.body.addEventListener('touchmove', e => e.preventDefault(), {passive:false});
 </script>
 </body>
 </html>
