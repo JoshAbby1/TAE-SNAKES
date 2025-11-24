@@ -201,9 +201,9 @@ window.addEventListener('resize', () => {
   }
 });
 
-// Prevent zoom and touch scrolling
-document.body.addEventListener('touchstart', e => e.preventDefault(), {passive:false});
-document.body.addEventListener('touchmove', e => e.preventDefault(), {passive:false});
+// Prevent zoom and touch scrolling only on canvas
+canvas.addEventListener('touchstart', e => e.preventDefault(), {passive:false});
+canvas.addEventListener('touchmove', e => e.preventDefault(), {passive:false});
 </script>
 </body>
 </html>
