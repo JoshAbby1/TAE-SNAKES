@@ -17,21 +17,10 @@
     font-family: sans-serif;
     text-align: center;
   }
-  h1 {
-    margin: 20px 0 10px;
-  }
-  p, #author {
-    margin: 0 0 10px;
-  }
-  canvas {
-    background: #000;
-    display: block;
-    margin-top: 10px;
-  }
-  #score {
-    margin: 10px;
-    font-size: 24px;
-  }
+  h1 { margin: 20px 0 10px; }
+  p, #author { margin: 0 0 10px; }
+  canvas { background: #000; display: block; margin-top: 10px; }
+  #score { margin: 10px; font-size: 24px; }
   .controls {
     display: grid;
     grid-template-columns: 60px 60px 60px;
@@ -76,9 +65,10 @@ let food;
 let direction;
 let score;
 let gameInterval;
+let speed = 220; // starting speed in ms
+let startTime;
 
 function resizeCanvas() {
-  // Make canvas fit screen in 4:5 ratio
   const maxWidth = window.innerWidth * 0.9;
   const maxHeight = window.innerHeight * 0.6;
   let width = maxWidth;
@@ -100,9 +90,11 @@ function init() {
   placeFood();
   score = 0;
   document.getElementById('score').innerText = 'Score: 0';
+  speed = 220;
+  startTime = Date.now();
 
   clearInterval(gameInterval);
-  gameInterval = setInterval(gameLoop, 100);
+  gameInterval = setInterval(gameLoop, speed);
 }
 
 function placeFood() {
@@ -114,7 +106,18 @@ function placeFood() {
   food = {x, y};
 }
 
+function updateSpeed() {
+  const elapsed = (Date.now() - startTime) / 1000; // seconds
+  if (elapsed > 60 && speed > 100) { // after 1 min, speed up
+    speed = 150; 
+    clearInterval(gameInterval);
+    gameInterval = setInterval(gameLoop, speed);
+  }
+}
+
 function gameLoop() {
+  updateSpeed();
+
   const head = {...snake[0]};
 
   if (direction === 'UP') head.y--;
@@ -172,8 +175,6 @@ document.getElementById('restartBtn').addEventListener('click', init);
 
 // Start game
 init();
-
-// Resize canvas if window changes
 window.addEventListener('resize', () => {
   resizeCanvas();
   draw();
