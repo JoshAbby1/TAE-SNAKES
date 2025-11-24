@@ -20,37 +20,50 @@
   h1 {
     margin: 20px 0 10px;
   }
-  p {
-    margin: 0 0 20px;
+  p, #author {
+    margin: 0 0 10px;
   }
   canvas {
     background: #000;
     display: block;
+    margin-top: 10px;
   }
   #score {
     margin: 10px;
     font-size: 24px;
   }
-  button {
+  .controls {
+    display: grid;
+    grid-template-columns: 60px 60px 60px;
+    grid-template-rows: 60px 60px;
+    gap: 10px;
     margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
   }
-  footer {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #aaa;
+  .controls button {
+    font-size: 20px;
+    padding: 10px;
+    cursor: pointer;
+    background: #555;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
   }
 </style>
 </head>
 <body>
 <h1>Snake Game</h1>
-<p>Use arrow keys to move. Eat the red food and grow!</p>
+<p>Use arrow keys or buttons to move. Eat the red food and grow!</p>
+<p id="author">Made by @nortydigitalcrew</p>
 <div id="score">Score: 0</div>
 <canvas id="gameCanvas"></canvas>
+
+<div class="controls">
+  <div></div><button id="upBtn">↑</button><div></div>
+  <button id="leftBtn">←</button><div></div><button id="rightBtn">→</button>
+  <div></div><button id="downBtn">↓</button><div></div>
+</div>
+
 <button id="restartBtn">Restart</button>
-<footer>Made by @nortydigitalcrew</footer>
 
 <script>
 const canvas = document.getElementById('gameCanvas');
@@ -64,13 +77,24 @@ let direction;
 let score;
 let gameInterval;
 
-function init() {
-  // Adjust canvas to fit screen
-  canvas.width = Math.floor(window.innerWidth / cellSize) * cellSize;
-  canvas.height = Math.floor(window.innerHeight / cellSize) * cellSize;
-  rows = canvas.height / cellSize;
+function resizeCanvas() {
+  // Make canvas fit screen in 4:5 ratio
+  const maxWidth = window.innerWidth * 0.9;
+  const maxHeight = window.innerHeight * 0.6;
+  let width = maxWidth;
+  let height = width * 5 / 4;
+  if (height > maxHeight) {
+    height = maxHeight;
+    width = height * 4 / 5;
+  }
+  canvas.width = Math.floor(width / cellSize) * cellSize;
+  canvas.height = Math.floor(height / cellSize) * cellSize;
   cols = canvas.width / cellSize;
+  rows = canvas.height / cellSize;
+}
 
+function init() {
+  resizeCanvas();
   snake = [{x: Math.floor(cols/2), y: Math.floor(rows/2)}];
   direction = 'RIGHT';
   placeFood();
@@ -93,13 +117,11 @@ function placeFood() {
 function gameLoop() {
   const head = {...snake[0]};
 
-  // Move snake head
   if (direction === 'UP') head.y--;
   else if (direction === 'DOWN') head.y++;
   else if (direction === 'LEFT') head.x--;
   else if (direction === 'RIGHT') head.x++;
 
-  // Check collisions
   if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows ||
       snake.some(segment => segment.x === head.x && segment.y === head.y)) {
     clearInterval(gameInterval);
@@ -109,7 +131,6 @@ function gameLoop() {
 
   snake.unshift(head);
 
-  // Eat food
   if (head.x === food.x && head.y === food.y) {
     score++;
     document.getElementById('score').innerText = 'Score: ' + score;
@@ -125,11 +146,9 @@ function draw() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Draw snake
   ctx.fillStyle = '#0f0';
   snake.forEach(segment => ctx.fillRect(segment.x*cellSize, segment.y*cellSize, cellSize, cellSize));
 
-  // Draw food
   ctx.fillStyle = '#f00';
   ctx.fillRect(food.x*cellSize, food.y*cellSize, cellSize, cellSize);
 }
@@ -142,11 +161,23 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
 });
 
+// Button controls
+document.getElementById('upBtn').addEventListener('click', () => { if(direction!=='DOWN') direction='UP'; });
+document.getElementById('downBtn').addEventListener('click', () => { if(direction!=='UP') direction='DOWN'; });
+document.getElementById('leftBtn').addEventListener('click', () => { if(direction!=='RIGHT') direction='LEFT'; });
+document.getElementById('rightBtn').addEventListener('click', () => { if(direction!=='LEFT') direction='RIGHT'; });
+
 // Restart button
 document.getElementById('restartBtn').addEventListener('click', init);
 
 // Start game
 init();
+
+// Resize canvas if window changes
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  draw();
+});
 </script>
 </body>
 </html>
